@@ -2,6 +2,12 @@ package com.frizzle.okhttp.frizzleok;
 
 import android.util.Log;
 
+import com.frizzle.okhttp.frizzleok.chain.ChainManager;
+import com.frizzle.okhttp.frizzleok.chain.ConnectionServerInterceptor;
+import com.frizzle.okhttp.frizzleok.chain.FrizzleInterceptor;
+import com.frizzle.okhttp.frizzleok.chain.ReRequestInterceptor;
+import com.frizzle.okhttp.frizzleok.chain.RequestHeaderInterceptor;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +26,12 @@ import okhttp3.internal.http.RealInterceptorChain;
  * description
  */
 public class FrizzleRealCall implements FrizzleCall{
-
     private FrizzleOkHttpClient frizzleOkHttpClient;
     private FrizzleRequest frizzleRequest;
     private boolean executed;
+    public FrizzleOkHttpClient getFrizzleOkHttpClient() {
+        return frizzleOkHttpClient;
+    }
 
     public FrizzleRealCall(FrizzleOkHttpClient frizzleOkHttpClient,FrizzleRequest frizzleRequest) {
         this.frizzleOkHttpClient = frizzleOkHttpClient;
@@ -42,6 +50,10 @@ public class FrizzleRealCall implements FrizzleCall{
 
             frizzleOkHttpClient.dispatcher().enqueue(new FrizzleAsyncCall(responseCallback));
         }
+    }
+
+    public FrizzleOkHttpClient getOkHttpClient2() {
+        return frizzleOkHttpClient;
     }
 
     final class FrizzleAsyncCall implements Runnable{
@@ -85,9 +97,13 @@ public class FrizzleRealCall implements FrizzleCall{
          * @throws IOException
          */
         private FrizzleResponse getResponseWithInterceptorChain() throws IOException {
-            FrizzleResponse response = new FrizzleResponse();
-            response.setBody("流程走通...");
-            return response;
+            ArrayList<FrizzleInterceptor> frizzleInterceptors = new ArrayList<>();
+            frizzleInterceptors.add(new ReRequestInterceptor()); // 重试拦截器 Response
+            frizzleInterceptors.add(new RequestHeaderInterceptor()); // 请求头拦截器 Response
+            frizzleInterceptors.add(new ConnectionServerInterceptor()); // 连接服务器的拦截器 Response
+
+            ChainManager chainManager = new ChainManager(frizzleInterceptors, 0, frizzleRequest, FrizzleRealCall.this);
+            return chainManager.getResponse(frizzleRequest); // 最终返回的Response
         }
     }
 

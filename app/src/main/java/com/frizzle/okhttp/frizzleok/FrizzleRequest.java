@@ -14,6 +14,11 @@ public class FrizzleRequest {
     private String rquestMethod = GET;
     private String url;
     private Map<String,String> mHeaderParams = new HashMap<>();
+    private FrizzleRequestBody requestBody;
+
+    public FrizzleRequestBody getRequestBody() {
+        return requestBody;
+    }
 
     public String getRquestMethod() {
         return rquestMethod;
@@ -35,12 +40,14 @@ public class FrizzleRequest {
         this.url = builder.url;
         this.rquestMethod =builder.rquestMethod;
         this.mHeaderParams = builder.mHeaderParams;
+        this.requestBody = builder.requestBody;
     }
 
     public static final class Builder{
         private String url;
         private String rquestMethod = GET;
         private Map<String,String> mHeaderParams = new HashMap<>();
+        private FrizzleRequestBody requestBody;
 
         public Builder url(String url){
             this.url = url;
@@ -54,6 +61,11 @@ public class FrizzleRequest {
 
         public Builder post(){
             this.rquestMethod = POST;
+            return this;
+        }
+
+        public Builder requestBody(FrizzleRequestBody requestBody){
+            this.requestBody = requestBody;
             return this;
         }
 

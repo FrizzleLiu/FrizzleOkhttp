@@ -7,6 +7,15 @@ package com.frizzle.okhttp.frizzleok;
  */
 public class FrizzleResponse {
     private String body;
+    private int statusCode;
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
 
     public void setBody(String body) {
         this.body = body;
